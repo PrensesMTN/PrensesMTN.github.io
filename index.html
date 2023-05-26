@@ -1,20 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Website</title>
+    <title>Site Haritası</title>
+    <style>
+        #harita {
+            height: 400px;
+            width: 200%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #353;
+            margin-top: 0;
+        }
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: #7feb8d;
+        }
+        li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        li a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #353;
+        }
+        li a:hover {
+            background-color: #fc8181;
+        }
+        li ul {
+            display: none;
+            position: absolute;
+            background-color: #f5a9a9;
+            border: 1px solid #ccc;
+            padding: 0;
+        }
+        li:hover ul {
+            display: block;
+        }
+        li ul li {
+            float: none;
+            width: 200px;
+            border-bottom: 1px solid #ccc;
+        }
+        .content {
+            margin-top: 20px;
+        }
+        .contact-info {
+            margin-bottom: 20px;
+        }
+        .contact-info p {
+            margin: 5px 0;
+        }
+        .contact-form {
+            max-width: 500px;
+        }
+        .contact-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .contact-form input[type="submit"] {
+            background-color: #353;
+            color: #f5a9a9;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .contact-form input[type="submit"]:hover {
+            background-color: #574d4d;
+        }
+        .map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWoAm2-btyCY7iMerV6-PsoYAALMA6K30&callback=initMap" async defer></script>
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById("harita"), {
+                center: { lat: 36.7856856, lng: 34.5276161 },
+                zoom: 17
+            });
+
+            var marker = new google.maps.Marker({
+                position: { lat: 36.7856856, lng: 34.5276161 },
+                map: map
+            });
+        }
+    </script>
 </head>
 <body>
-    <h1>Welcome to my website</h1>
-
-    <?php
-    // PHP kodunuzu buraya yerleştirin
-    $name = "John";
-    echo "Hello, " . $name;
-    ?>
-
-    <!-- Diğer HTML kodlarınızı buraya ekleyin -->
-    <p>This is a paragraph.</p>
-    <a href="index.php">Go to another page</a>
-
-</body>
-</html>
+    <h1>Site Haritası</h1>
+    <ul>
+        <li><a href="index.php?menu=1">Ana Sayfa</a></li>
+        <li><a href="index.php?menu=2">Hakkımda</a>
+            <ul>
+                <li><a href="index.php?menu=3">Öz
