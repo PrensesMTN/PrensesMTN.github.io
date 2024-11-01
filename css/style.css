@@ -464,7 +464,7 @@ a {
       -o-transition: .3s all ease;
       transition: .3s all ease; }
       .testimonial-slider-wrap #testimonial-nav > span:hover {
-        background: #3b5d50;
+        background: #563b5d;
         color: #ffffff; }
     .testimonial-slider-wrap #testimonial-nav .prev {
       left: -10px; }
@@ -504,7 +504,7 @@ a {
         transition: .3s all ease;
         background-color: #d6d6d6; }
       .testimonial-slider-wrap .tns-nav button:hover:before, .testimonial-slider-wrap .tns-nav button.tns-nav-active:before {
-        background-color: #3b5d50; }
+        background-color: #5b3b5d; }
 
 .before-footer-section {
   padding: 7rem 0 12rem 0 !important; }
@@ -561,7 +561,7 @@ a {
     .footer-section .subscription-form h3 {
       font-size: 18px;
       font-weight: 500;
-      color: #3b5d50; }
+      color: #5b3b5d; }
     .footer-section .subscription-form .form-control {
       height: 50px;
       border-radius: 10px;
@@ -612,10 +612,10 @@ a {
       line-height: 40px;
       display: inline-block;
       background: #dce5e4;
-      color: #3b5d50;
+      color: #5d3b5b;
       border-radius: 50%; }
       .footer-section .custom-social li a:hover {
-        background: #3b5d50;
+        background: #5d3b5d;
         color: #ffffff; }
   .footer-section .border-top {
     border-color: #dce5e4; }
