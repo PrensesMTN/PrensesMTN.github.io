@@ -105,7 +105,7 @@ a {
     .hero {
       padding: calc(8rem - 30px) 0 8rem 0; } }
   .hero .intro-excerpt {
-    position: absolute;
+    position: relative;
     z-index: 4; }
     @media (min-width: 992px) {
       .hero .intro-excerpt {
@@ -120,9 +120,9 @@ a {
   .hero p {
     color: rgba(255, 255, 255, 0.5),margin-botom 30px; }
   .hero .hero-img-wrap {
-    position: absolute; }
+    position: relative; }
     .hero .hero-img-wrap img {
-      position: absolute;
+      position: relative;
       top: 0px;
       right: 0px;
       z-index: 2;
@@ -145,7 +145,7 @@ a {
           right: -100px; } }
     .hero .hero-img-wrap:after {
       content: "";
-      position: absolute;
+      position: relative;
       width: 255px;
       height: 217px;
       background-image: url("../images/dots-light.svg");
