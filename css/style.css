@@ -173,18 +173,18 @@ a {
     -webkit-box-shadow: none;
     box-shadow: none; }
   .btn.btn-primary {
-    background: #5d3b5d;
-    border-color: #593b5d; }
+    background: #6C3483;
+    border-color: #6C3483; }
     .btn.btn-primary:hover {
-      background: #4d314b;
-      border-color: #4d3147; }
+      background: #A569BD;
+      border-color: #A569BD; }
   .btn.btn-secondary {
     color: #2f2f2f;
-    background: #f9bf29;
-    border-color: #f9bf29; }
+    background:#b029f9;
+    border-color: #b029f9; }
     .btn.btn-secondary:hover {
-      background: #f8b810;
-      border-color: #f8b810; }
+      background: #af10f8;
+      border-color: #af10f8; }
   .btn.btn-white-outline {
     background: transparent;
     border-width: 2px;
