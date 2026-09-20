@@ -1,198 +1,1034 @@
-<!doctype html>
-<html lang="en">
+
+<!DOCTYPE html>
+<html lang="tr" class="dark">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="Prenses Metin" content="genç girişimci, yazılım, Prenses, metin ">
-  <link rel="shortcut icon" href="favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeknoSanat Akademi - 3D Uzay Gemisi Kampüsü</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4', 900: '#164e63' },
+                        blue: { 900: '#1e3a8a', 950: '#0f172a' },
+                        amber: { 400: '#fbbf24', 500: '#f59e0b' }
+                    },
+                    fontFamily: {
+                        mono: ['Courier New', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Three.js & Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
-  <meta name="description" content="" />
-  <meta name="keywords" content="bootstrap, bootstrap4" />
-  <meta name="keywords" content="Gifted Coder Teknoloji, Prenses Metin" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap');
 
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #020617;
+            color: #e0f2fe;
+            overflow: hidden;
+            user-select: none;
+        }
 
-		<!-- Bootstrap CSS -->
-		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-		<link href="css/tiny-slider.css" rel="stylesheet">
-		<link href="css/style.css" rel="stylesheet">
-		<title>Gifted Coder Technology </title>
-	</head>
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
 
-	<body>
+        /* Sci-Fi Grid Background */
+        .bg-sci-fi-grid {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(6, 182, 212, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(6, 182, 212, 0.08) 1px, transparent 1px);
+        }
 
-		<!-- Start Header/Navigation -->
-		<nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+        /* Glassmorphism Panels */
+        .hud-panel {
+            background: rgba(3, 12, 27, 0.88);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(34, 211, 238, 0.35);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.2), inset 0 0 15px rgba(6, 182, 212, 0.08);
+        }
 
-			<div class="container">
-				<a class="navbar-brand" href="index.html">Gifted Coder Technology<span>.</span></a>
+        .hud-panel-amber {
+            background: rgba(28, 16, 4, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(245, 158, 11, 0.6);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+        }
 
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
+        .sci-fi-corners { position: relative; }
+        .sci-fi-corners::before, .sci-fi-corners::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-color: #22d3ee;
+            border-style: solid;
+            pointer-events: none;
+        }
+        .sci-fi-corners::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .sci-fi-corners::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
 
-				<div class="collapse navbar-collapse" id="navbarsFurni">
-					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-						<li class="nav-item active"><a class="nav-link" href="index.html">Home</a></li>
-						<li><a class="nav-link" href="about.html">About us</a></li>
-						<li><a class="nav-link" href="solutions.html">Solutions</a></li>
-						<li><a class="nav-link" href="contact.html">Contact us</a></li>
-					</ul>
-				</div>
-			</div>
-				
-		</nav>
-		<!-- End Header/Navigation -->
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(2, 6, 23, 0.9); }
+        ::-webkit-scrollbar-thumb { background: #06b6d4; border-radius: 2px; }
 
-		<!-- Start Hero Section -->
-			<div class="hero">
-				<div class="container">
-					<div class="row justify-content-between">
-						<div class="col-lg-5">
-							<div class="intro-excerpt">
-								<h1>Innovation Starts with Youth. </h1>
-								<h2>  </h2>
-							</div>
-						</div>
-						<div class="col-lg-7">
-							<img src="images/general_big.png" class="img-fluid mb-4" alt="Gifted Coder Teknoloji">
-						</div> 
-					</div>
-				</div>
-			</div>
-		<!-- End Hero Section -->
+        .scanlines {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.015), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.015));
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+        }
 
-		<!-- Start Product Section -->
-		<div class="product-section">
-			<div class="container">
-				<div class="row">
+        .room-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: auto;
+            white-space: nowrap;
+        }
+        .room-marker:hover {
+            transform: translate(-50%, -50%) scale(1.12);
+            z-index: 50;
+        }
 
-					<!-- Start Column 1 -->
-					<div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
-						<h2 class="mb-4 section-title">Add comfort to your air conditioning use with Eyes-HVAC.</h2>
-						<p class="mb-4">Eyes-HVAC offers a smart and efficient solution to enhance your air conditioning experience. Designed for homes, offices, hotels, and various facilities, it not only optimizes indoor air quality but also ensures energy savings and user comfort. With advanced features like remote control, automated management, and enhanced security integration, Eyes-HVAC makes air conditioning smarter, more convenient, and environmentally friendly. </p>
-						<p><a href="solutions.html" class="btn">Explore</a></p>
-					</div> 
-					<!-- End Column 1 -->
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); opacity: 0.9; }
+            50% { transform: scale(1.35); opacity: 0.25; }
+            100% { transform: scale(0.9); opacity: 0.9; }
+        }
+        .pulse-effect { animation: pulse-ring 2.2s infinite ease-in-out; }
+    </style>
+</head>
+<body class="bg-sci-fi-grid h-screen w-screen flex flex-col overflow-hidden text-slate-100">
 
-					<!-- Start Column 2 -->
-					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-						<a class="product-item" href="solutions.html">
-							<img src="images/project_design.jpeg" class="img-fluid product-thumbnail">
-							<h3 class="product-title">Eyes-HVAC-Businness-Panoromic-P Model</h3>
-						</a>
-					</div> 
-					<!-- End Column 2 -->
+    <!-- Holographic CRT Effect -->
+    <div class="scanlines absolute inset-0 z-10 pointer-events-none"></div>
 
-					<!-- Start Column 3 -->
-					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-						<a class="product-item" href="solutions.html">
-							<img src="images/personalized_software.jpeg" class="img-fluid product-thumbnail">
-							<h3 class="product-title">Eyes-HVAC-Personel-Panoromic-P Model</h3>
-						</a>
-					</div>
-					<!-- End Column 3 -->
+    <!-- HEADER NAVBAR -->
+    <header class="relative z-20 flex justify-between items-center px-6 py-3 border-b border-cyan-500/30 bg-slate-950/85 backdrop-blur-md">
+        <div class="flex items-center gap-4">
+            <div class="relative flex items-center justify-center w-11 h-11 rounded-lg border border-cyan-400 bg-cyan-950/60 text-cyan-400 text-2xl font-bold shadow-[0_0_18px_rgba(34,211,238,0.5)]">
+                <i class="fa-solid fa-shuttle-space"></i>
+            </div>
+            <div>
+                <h1 class="font-orbitron font-black text-lg md:text-xl tracking-wider text-cyan-400 uppercase flex items-center gap-2">
+                    TEKNOSANAT AKADEMİ <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 font-mono">3D UZAY GEMİSİ KAMPÜSÜ</span>
+                </h1>
+                <p class="text-xs text-slate-400 tracking-widest font-mono"> UZAY GEMİSİ DIŞ GÖVDESİ & MİMARİ İÇ KROKİ SİMÜLASYONU</p>
+            </div>
+        </div>
 
-					<!-- Start Column 4 -->
-					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-						<a class="product-item" href="solutions.html">
-							<img src="images/exotic_lightning.jpeg" class="img-fluid product-thumbnail">
-							<h3 class="product-title">Eyes-HVAC-Basic-Panoromic-P Model</h3>
-						</a>
-					</div>
-					<!-- End Column 4 -->
+        <div class="hidden lg:flex items-center gap-6 text-xs font-mono border-x border-cyan-500/20 px-6">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-slate-400">İON İTKİ MOTORLARI:</span>
+                <span class="text-emerald-400 font-bold">%100 AKTİF</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-eye text-cyan-400"></i>
+                <span class="text-slate-400">GÖRÜNÜM:</span>
+                <span id="currentViewModeText" class="text-cyan-400 font-bold">HOLOGRAM BLUEPRINT (3D)</span>
+            </div>
+        </div>
 
-				</div>
-			</div>
-		</div>
-		<!-- End Product Section -->
+        <div class="flex items-center gap-3">
+            <button id="toggleAudioBtn" onclick="toggleAudio()" class="px-3.5 py-1.5 rounded border border-cyan-500/40 bg-cyan-950/40 hover:bg-cyan-500/20 text-cyan-300 text-xs font-mono transition flex items-center gap-2">
+                <i id="audioIcon" class="fa-solid fa-volume-xmark text-slate-400"></i>
+                <span id="audioText">SES: KAPALI</span>
+            </button>
+            <button onclick="resetCameraView()" class="px-3.5 py-1.5 rounded border border-cyan-500/40 bg-cyan-950/40 hover:bg-cyan-500/20 text-cyan-300 text-xs font-mono transition flex items-center gap-2">
+                <i class="fa-solid fa-arrows-to-dot"></i> GEMİYE ODAKLAN
+            </button>
+        </div>
+    </header>
 
+    <!-- MAIN CANVAS & HUD -->
+    <div class="relative flex-1 w-full h-full overflow-hidden">
+        
+        <!-- WebGL Canvas -->
+        <div id="canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
 
-		<!-- Start We Help Section -->
-		<div class="we-help-section">
-			<div class="container">
-				<div class="row justify-content-between">
-					<div class="col-lg-7 mb-5 mb-lg-0">
-						<div class="imgs-grid">
-							<div class="grid grid-1"><img src="images/img-grid-1.jpg" alt="Untree.co"></div>
-							<div class="grid grid-2"><img src="images/img-grid-2.jpg" alt="Untree.co"></div>
-							<div class="grid grid-3"><img src="images/img-grid-3.jpg" alt="Untree.co"></div>
-						</div>
-					</div>
-					<div class="col-lg-5 ps-lg-5">
-						<h2 class="section-title mb-4">Step into the Future with Technology</h2>
-						<p>At Gifted Coder Technology, we stand out in the business world with innovative solutions and cutting-edge technologies. Our professional team delivers the best technological solutions tailored to optimize your business processes and enhance your efficiency. We are ready to shape the future together!</p>
+        <!-- Dynamic Floating Labels Container -->
+        <div id="room-labels-container" class="absolute inset-0 pointer-events-none z-20"></div>
 
-						<ul class="list-unstyled custom-list my-4">
-							<li>We shape the future with innovative solutions that push the boundaries of technology.</li>
-							<li>We aim to be a globally recognized and trusted technology leader.</li>
-							<li>We help our clients transform their businesses by providing them with cutting-edge technologies.</li>
-							<li>We produce solutions that add value to society through continuous improvement and innovation.</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- End We Help Section -->
+        <!-- LEFT CONTROLS & SECTOR LIST -->
+        <div class="absolute top-6 left-6 z-20 flex flex-col gap-3">
+            <div class="hud-panel p-2.5 rounded-lg sci-fi-corners flex flex-col gap-2 w-56">
+                <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest px-2 py-0.5 border-b border-cyan-500/20">Gövde ve Blueprint Modu</span>
+                
+                <button id="btnModeBlueprint" onclick="setRenderMode('blueprint')" class="w-full text-left px-3 py-2 rounded bg-cyan-500/25 border border-cyan-400 text-cyan-100 text-xs font-mono font-bold transition flex items-center justify-between">
+                    <span><i class="fa-solid fa-drafting-compass mr-2"></i>BLUEPRINT (MİMARİ)</span>
+                    <i class="fa-solid fa-check text-cyan-400 text-xs"></i>
+                </button>
 
-		
+                <button id="btnMode3D" onclick="setRenderMode('3d')" class="w-full text-left px-3 py-2 rounded hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 text-xs font-mono font-bold transition flex items-center justify-between">
+                    <span><i class="fa-solid fa-rocket mr-2"></i>GERÇEKÇİ 3D GÖVDE</span>
+                </button>
+            </div>
 
-		<!-- Start Popular Product -->
+            <!-- Room Navigation Shortcut List -->
+            <div class="hud-panel p-3 rounded-lg sci-fi-corners flex flex-col gap-2 w-56 max-h-80 overflow-y-auto">
+                <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest pb-1 border-b border-cyan-500/20">Gemi Sektörleri (Kroki)</span>
+                <div id="quickNavList" class="flex flex-col gap-1 text-xs font-mono">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
 
-	    <div class="we-help-section">
-			<div class="container">
-				<div class="row justify-content-between">
-					<div class="col-lg-7 mb-5 mb-lg-0">
-						<div class="imgs-grid">
-							<div class="grid grid-2"><img src="images/mersinistisarekulubu_logo2.png" alt="Mersin İstişare Kulübü" ></div>
-							<div class="grid grid-1"><img src="images/binnuryetiklogo.jpeg" alt="Binnur Yetik Danışmanlık"></div>
-							<div class="grid grid-3"><img src="images/pozitiflogo.png" alt="Özel Pozitif Bilgi Koleji, Lise, Ortokul"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	
+        <!-- RIGHT HUD PANEL - ROOM DETAILS -->
+        <aside id="infoPanel" class="absolute top-6 right-6 bottom-6 w-96 z-30 hud-panel p-5 rounded-xl flex flex-col transition-all duration-500 transform translate-x-[420px] opacity-0 sci-fi-corners">
+            
+            <div class="flex items-start justify-between pb-3 border-b border-cyan-500/30">
+                <div class="flex items-center gap-3">
+                    <div id="infoBadge" class="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-300 text-xl shadow-[0_0_12px_rgba(34,211,238,0.4)]">
+                        <i class="fa-solid fa-door-open"></i>
+                    </div>
+                    <div>
+                        <h2 id="infoTitle" class="font-orbitron font-bold text-lg text-cyan-300 tracking-wide">SEKTÖR ADI</h2>
+                        <span id="infoSubTitle" class="text-xs font-mono text-slate-400 uppercase">AKADEMİ KAMPÜSÜ</span>
+                    </div>
+                </div>
+                <button onclick="closeInfoPanel()" class="text-slate-400 hover:text-cyan-400 text-lg transition p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-		<!-- Start Footer Section -->
-		<footer class="footer-section py-4">
-			<div class="container relative">
-			  <div class="row g-3 justify-content-center">
-				<div class="col-12 text-center mb-3">
-					<ul class="list-unstyled custom-social d-inline-flex justify-content-center align-items-center">
-						<li class="nav-item px-2"><a href="https://x.com/PrensesMTN" class="social-icon"><span class="fa fa-brands fa-twitter" style="font-size: 2.5rem;"></span></a></li>
-						<li class="px-2"><a href="https://www.instagram.com/gifted.coder.tech/" class="social-icon"><span class="fa fa-brands fa-instagram" style="font-size: 2.5rem;"></span></a></li>
-						<li class="px-2"><a href="https://www.linkedin.com/company/giftedcodertechnology/" class="social-icon"><span class="fa fa-brands fa-linkedin" style="font-size: 2.5rem;"></span></a></li>  
-					</ul>
-				</div>
-				<div class="col-12 text-center">
-				  <div class="row justify-content-center">
-					<div class="col-auto">
-					  <ul class="list-unstyled d-inline-flex">
-						<li><a class="nav-link px-2" href="about.html">About us</a></li>
-						<li><a class="nav-link px-2" href="solutions.html">Solutions</a></li>
-						<li><a class="nav-link px-2" href="contact.html">Contact us</a></li>
-					  </ul>
-					</div>
-				  </div>
-				</div>
-			  </div>
-			  <div class="border-top copyright">
-				<div class="row pt-2">
-				  <div class="col-12 text-center">
-					<p class="mb-2">© 2024 Gifted Coder Technology. Created by Persion</p>
-				  </div>
-				</div>
-			  </div>
-			</div>
-		  </footer>
-		  
-		<!-- End Footer Section -->	
+            <div class="flex-1 overflow-y-auto my-4 pr-1 space-y-4 text-xs font-sans text-slate-300">
+                
+                <div class="grid grid-cols-3 gap-2 font-mono text-[10px] bg-slate-900/80 p-2.5 rounded border border-cyan-500/20 text-center">
+                    <div>
+                        <div class="text-slate-400">OKSİJEN</div>
+                        <div class="text-emerald-400 font-bold">%99.9</div>
+                    </div>
+                    <div>
+                        <div class="text-slate-400">GÜÇ</div>
+                        <div class="text-cyan-400 font-bold">240 KW</div>
+                    </div>
+                    <div>
+                        <div class="text-slate-400">KAPASİTE</div>
+                        <div id="infoCapacity" class="text-amber-400 font-bold">30 Kişi</div>
+                    </div>
+                </div>
 
+                <div>
+                    <h3 class="font-mono text-cyan-400 font-semibold mb-1 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info text-[10px]"></i> Sektör Tanımı
+                    </h3>
+                    <p id="infoDescription" class="leading-relaxed bg-slate-900/60 p-3 rounded border border-slate-800 text-slate-300">
+                        Oda bilgisi yükleniyor...
+                    </p>
+                </div>
 
-		<script src="js/bootstrap.bundle.min.js"></script>
-		<script src="js/tiny-slider.js"></script>
-		<script src="js/custom.js"></script>
-	</body>
+                <div>
+                    <h3 class="font-mono text-cyan-400 font-semibold mb-2 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-diagram-next text-[10px]"></i> Bağlantılı Kapı Geçişleri (=)
+                    </h3>
+                    <div id="infoDoors" class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                        <!-- Doors inserted dynamically -->
+                    </div>
+                </div>
 
+                <div>
+                    <h3 class="font-mono text-cyan-400 font-semibold mb-2 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-microchip text-[10px]"></i> Donanım Özellikleri
+                    </h3>
+                    <div id="infoFeatures" class="grid grid-cols-2 gap-2 font-mono">
+                        <!-- Features inserted dynamically -->
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-mono text-cyan-400 font-semibold mb-1.5 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-camera text-[10px]"></i> Canlı Sektör Görünümü
+                    </h3>
+                    <div class="relative w-full h-36 rounded border border-cyan-500/30 overflow-hidden bg-slate-950 flex items-center justify-center group">
+                        <img id="infoImage" src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80" alt="Room Visual" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-red-600/90 text-[10px] font-mono text-white flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> SİMÜLASYON
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pt-3 border-t border-cyan-500/30">
+                <button id="btnEnterInterior" onclick="enterRoomInterior()" class="w-full py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-orbitron font-bold text-xs tracking-wider shadow-[0_0_18px_rgba(6,182,212,0.5)] transition duration-300 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-vr-cardboard text-base"></i>
+                    <span>3D İÇ MEKANA GİR (360° İNCELE)</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- EXIT INTERIOR HUD BUTTON -->
+        <div id="exitInteriorHud" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 hidden transition duration-300">
+            <button onclick="exitRoomInterior()" class="px-6 py-3 rounded-full hud-panel-amber text-amber-300 font-orbitron font-bold text-xs tracking-widest shadow-[0_0_25px_rgba(245,158,11,0.6)] hover:bg-amber-500/20 transition flex items-center gap-3 border border-amber-400">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>DIŞ GÖRÜNÜME DÖN (UZAY GEMİSİ)</span>
+            </button>
+        </div>
+
+        <!-- FOOTER HUD CONTROLS HELP -->
+        <div class="absolute bottom-3 left-6 z-20 text-[11px] font-mono text-slate-400 flex items-center gap-4 bg-slate-950/80 px-3 py-1.5 rounded border border-slate-800">
+            <div><i class="fa-solid fa-mouse text-cyan-400 mr-1"></i> Sol Tık: Görüşü Döndür</div>
+            <div><i class="fa-solid fa-arrows-up-down-left-right text-cyan-400 mr-1"></i> Sağ Tık: Pan / Kaydır</div>
+            <div><i class="fa-solid fa-arrows-up-down text-cyan-400 mr-1"></i> Tekerlek: Yakınlaştır</div>
+        </div>
+    </div>
+
+    <script>
+        // ROOM DATA STRUCTURE - Matched precisely to sketch image_e94323.jpg
+        const ROOMS_DATA = {
+            'hangar': {
+                id: 'hangar',
+                title: 'HANGAR',
+                subtitle: 'Giriş Kapısı & Mekik Deposu',
+                badgeIcon: 'fa-shuttle-space',
+                // Positioned top-left (sol üst)
+                pos: { x: -7.5, y: 1.0, z: -5.5 },
+                size: { x: 7.0, y: 2.0, z: 3.6 },
+                color: 0x0284c7,
+                capacity: '60 Kişi',
+                doors: ['Köprü / Cowork (Sağ)'],
+                desc: 'Uzay gemisinin ilk ana giriş kapısına ev sahipliği yapan devasa hangar. Dronlar, prototipler ve imalat araçları için özel rampalara sahiptir.',
+                features: ['Giriş Kapısı Rampası', '3D Yazıcı Çiftliği', 'Dron Test Sahası', 'Robotik Montaj'],
+                img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+                type: 'hangar'
+            },
+            'kopru': {
+                id: 'kopru',
+                title: 'KÖPRÜ (COWORK)',
+                subtitle: 'Ortak Çalışma & Komuta',
+                badgeIcon: 'fa-diagram-project',
+                pos: { x: -0.5, y: 1.0, z: -5.5 },
+                size: { x: 6.0, y: 2.0, z: 3.6 },
+                color: 0x06b6d4,
+                capacity: '35 Kişi',
+                doors: ['Hangar (Sol =)', 'Science Kafe (Sağ =)'],
+                desc: 'Hangar ile Science Kafe arasında yer alan ortak çalışma (cowork) ve komuta merkezi. Proje takımları için modüler masalara sahiptir.',
+                features: ['Modüler Cowork Masaları', 'Holografik Sunum', 'Kaptan Masası', 'Yüksek Hızlı Fiber'],
+                img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
+                type: 'kopru'
+            },
+            'science_kafe': {
+                id: 'science_kafe',
+                title: 'SCIENCE KAFE',
+                subtitle: 'Sosyal Dinlenme & Kafe',
+                badgeIcon: 'fa-mug-hot',
+                pos: { x: 6.5, y: 1.0, z: -5.5 },
+                size: { x: 6.5, y: 2.0, z: 3.6 },
+                color: 0x10b981,
+                capacity: '30 Kişi',
+                doors: ['Köprü (Sol =)', 'Kiler (Alt =)', 'Keşif Güvertesi (Alt =)'],
+                desc: 'Geminin üst sağ aksında bulunan sosyal kafe. Kahve barı, bilim kütüphanesi ve keşif güvertesine bağlanan geçiş kapıları bulunur.',
+                features: ['Moleküler Kahve Barı', 'Sohbet Localari', 'Akıllı Yiyecek İkmali', 'Astro-Kütüphane'],
+                img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
+                type: 'kafe'
+            },
+            'kic_wc': {
+                id: 'kic_wc',
+                title: 'KIÇ WC',
+                subtitle: 'Arka Islak Alan',
+                badgeIcon: 'fa-restroom',
+                pos: { x: -8.0, y: 1.0, z: 0.0 },
+                size: { x: 2.8, y: 2.0, z: 2.8 },
+                color: 0x64748b,
+                capacity: 'Servis',
+                doors: ['Üst Koridor (=)'],
+                desc: 'Geminin kiç (arka) kısmındaki üst koridordan erişilen hijyen ve kişisel bakım ünitesi.',
+                features: ['Sensörlü Dezenfeksiyon', 'Su Geri Dönüşüm', 'Soyunma Dolapları'],
+                img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
+                type: 'wc'
+            },
+            'makine_dairesi': {
+                id: 'makine_dairesi',
+                title: 'MAKİNE DAİRESİ',
+                subtitle: 'Enerji & Reaktör Çekirdeği',
+                badgeIcon: 'fa-bolt',
+                pos: { x: -4.2, y: 1.0, z: 0.0 },
+                size: { x: 4.2, y: 2.0, z: 2.8 },
+                color: 0xef4444,
+                capacity: 'Teknik Personel',
+                doors: ['Üst Koridor (=)', 'Pruva WC (Sağ)'],
+                desc: 'Kiç WC yanında konumlanmış, geminin ana füzyon reaktörü ile kuantum sunucularını barındıran teknik enerji merkezi.',
+                features: ['Plazma Füzyon Reaktörü', 'Kuantum Sunucu Kabinleri', 'Güç Dağıtım Ünitesi'],
+                img: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80',
+                type: 'makine'
+            },
+            'pruva_wc': {
+                id: 'pruva_wc',
+                title: 'PRUVA WC',
+                subtitle: 'Ön Islak Alan',
+                badgeIcon: 'fa-restroom',
+                pos: { x: -1.0, y: 1.0, z: 0.0 },
+                size: { x: 2.0, y: 2.0, z: 2.8 },
+                color: 0x475569,
+                capacity: 'Servis',
+                doors: ['Makine Dairesi (Sol)', 'Yaratım Kabini (Sağ)'],
+                desc: 'Makine dairesi ile Yaratım kabini arasında yer alan ön hijyen ünitesi.',
+                features: ['Otomatik Temizlik', 'Eko Hijyen'],
+                img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
+                type: 'wc'
+            },
+            'tanitim_kabini': {
+                id: 'tanitim_kabini',
+                title: 'YARATIM KABİNİ',
+                subtitle: 'Ziyaretçi & VR Deneyim',
+                badgeIcon: 'fa-circle-play',
+                pos: { x: -6.5, y: 1.0, z: 5.5 },
+                size: { x: 5.5, y: 2.0, z: 3.8 },
+                color: 0x14b8a6,
+                capacity: '20 Kişi',
+                desc: 'Gemiye gelen misafirlerin ve öğrencilerin VR gözlüklerle akademi turlarını deneyimlediği interaktif Yaratım merkezi.',
+                features: ['İnteraktif Holo-Ekran', 'VR Akademi Turu', 'Kayıt Bankosu'],
+                img: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=600&q=80',
+                type: 'tanitim'
+            },
+            'kiler': {
+                id: 'kiler',
+                title: 'KİLER / ERZAK',
+                subtitle: 'Lojistik & Depo',
+                badgeIcon: 'fa-boxes-stacked',
+                pos: { x: 1.8, y: 1.0, z: 0.0 },
+                size: { x: 3.0, y: 2.0, z: 2.8 },
+                color: 0x8b5cf6,
+                capacity: 'Lojistik',
+                doors: ['Science Kafe (Üst =)', 'Köşk (Sağ =)'],
+                desc: 'Science Kafe ile Seyir Odası arasında konumlandırılmış, donanım, yedek parça ve erzak deposu.',
+                features: ['Otomatik Parça Deposu', 'ESD Güvenli Raflar', 'Soğuk İkmal Ünitesi'],
+                img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80',
+                type: 'kiler'
+            },
+            'kosk_seyir': {
+                id: 'kosk_seyir',
+                title: 'SEYİR ODASI (KÖŞK B/K)',
+                subtitle: 'Panoramik Yıldız İzleme',
+                badgeIcon: 'fa-eye',
+                pos: { x: 6.5, y: 1.0, z: 0.0 },
+                size: { x: 6.5, y: 2.0, z: 2.8 },
+                color: 0xf59e0b,
+                capacity: '25 Kişi',
+                desc: 'Kilerin hemen yanında, geminin ön açısına bakan köşk ve seyir odası. Yıldız gözlemleri ve özel toplantılar için kullanılır.',
+                features: ['Panoramik Ön Cam', 'Sıfır Yerçekimi Koltuklar', 'Yıldız Haritası Projeksiyonu'],
+                img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
+                type: 'seyir'
+            },
+            'kesif_guvertesi': {
+                id: 'kesif_guvertesi',
+                title: 'KEŞİF GÜVERTESİ / SINIF',
+                subtitle: 'İnteraktif Akademi Dersliği',
+                badgeIcon: 'fa-graduation-cap',
+                pos: { x: 3.2, y: 1.0, z: 5.5 },
+                size: { x: 9.5, y: 2.0, z: 3.8 },
+                color: 0xec4899,
+                capacity: '45 Kişi',
+                doors: ['Science Kafe (Üst =)', 'Yaratım Kabini (Sol =)'],
+                desc: 'Geminin en alt sağ kısmında yer alan geniş uzay dersliği. Yazılım, yapay zeka ve uzay bilimleri eğitimleri burada verilir.',
+                features: ['Holografik Akıllı Tahta', '30 Kişilik VR Istasyon', 'Akıllı Sıralar'],
+                img: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80',
+                type: 'sinif'
+            }
+        };
+
+        let scene, camera, renderer, controls;
+        let roomMeshes = {};
+        let roomHotspotElements = {};
+        let doorMeshes = [];
+        let selectedRoomKey = null;
+        let currentRenderMode = 'blueprint';
+        let isInteriorView = false;
+        let interiorGroup = null;
+        let shipGroup = null;
+        let realisticHullMesh = null;
+        let wireframeHullMesh = null;
+        let audioEnabled = false;
+        let audioCtx = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initThreeJS();
+            createRealisticSpaceshipExterior();
+            createRoomModules();
+            createDoorConnections();
+            setupQuickNav();
+            animate();
+            
+            window.addEventListener('resize', onWindowResize);
+        });
+
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020617);
+            scene.fog = new THREE.FogExp2(0x020617, 0.012);
+
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 32, 32);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2.05;
+            controls.minDistance = 6;
+            controls.maxDistance = 85;
+            controls.target.set(0, 0, 0);
+
+            // Lighting Setup
+            const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.8);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.8);
+            dirLight.position.set(25, 45, 25);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
+            scene.add(dirLight);
+
+            const cyanGlow = new THREE.PointLight(0x06b6d4, 3, 50);
+            cyanGlow.position.set(0, 8, 0);
+            scene.add(cyanGlow);
+
+            createSpaceStars();
+
+            // Sci-Fi Base Grid
+            const gridHelper = new THREE.GridHelper(90, 90, 0x22d3ee, 0x1e293b);
+            gridHelper.position.y = -0.1;
+            scene.add(gridHelper);
+
+            interiorGroup = new THREE.Group();
+            scene.add(interiorGroup);
+        }
+
+        function createSpaceStars() {
+            const starsGeom = new THREE.BufferGeometry();
+            const count = 1200;
+            const positions = new Float32Array(count * 3);
+
+            for(let i = 0; i < count * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 250;
+                positions[i+1] = (Math.random() - 0.5) * 250;
+                positions[i+2] = (Math.random() - 0.5) * 250;
+            }
+
+            starsGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const starsMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.45, transparent: true, opacity: 0.7 });
+            const starField = new THREE.Points(starsGeom, starsMat);
+            scene.add(starField);
+        }
+
+        function createRealisticSpaceshipExterior() {
+            shipGroup = new THREE.Group();
+
+            // 1. Sleek Starship Outer Hull Envelope
+            const hullShape = new THREE.Shape();
+            // Nose Cone (Front / Starboard Bow)
+            hullShape.moveTo(11.5, -2.0);
+            hullShape.lineTo(11.5, 2.0);
+            hullShape.lineTo(8.5, 8.5); // Bow curve right
+            hullShape.lineTo(-11.5, 8.5); // Stern rear right
+            hullShape.lineTo(-13.0, 4.0); // Thruster pod right
+            hullShape.lineTo(-13.0, -4.0); // Thruster pod left
+            hullShape.lineTo(-11.5, -8.5); // Stern rear left
+            hullShape.lineTo(8.5, -8.5); // Bow curve left
+            hullShape.closePath();
+
+            const extrudeSettings = { depth: 0.6, bevelEnabled: true, bevelSegments: 4, steps: 2, bevelSize: 0.5, bevelThickness: 0.5 };
+            const hullGeometry = new THREE.ExtrudeGeometry(hullShape, extrudeSettings);
+            hullGeometry.rotateX(Math.PI / 2);
+
+            // Realistic Metallic Material
+            const hullMat3D = new THREE.MeshStandardMaterial({
+                color: 0x0f172a,
+                roughness: 0.35,
+                metalness: 0.85,
+                emissive: 0x0284c7,
+                emissiveIntensity: 0.05
+            });
+
+            // Blueprint Wireframe Material
+            const hullMatBP = new THREE.MeshStandardMaterial({
+                color: 0x0284c7,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.35
+            });
+
+            realisticHullMesh = new THREE.Mesh(hullGeometry, hullMat3D);
+            realisticHullMesh.position.set(-0.5, -0.2, 0);
+            realisticHullMesh.receiveShadow = true;
+            realisticHullMesh.visible = false; // Starts in blueprint mode
+            shipGroup.add(realisticHullMesh);
+
+            wireframeHullMesh = new THREE.Mesh(hullGeometry, hullMatBP);
+            wireframeHullMesh.position.set(-0.5, -0.2, 0);
+            shipGroup.add(wireframeHullMesh);
+
+            // 2. Command Bridge Superstructure Deck (Top Castle)
+            const bridgeGeom = new THREE.BoxGeometry(7, 1.2, 5);
+            const bridgeMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.2 });
+            const bridgeTower = new THREE.Mesh(bridgeGeom, bridgeMat);
+            bridgeTower.position.set(1.0, 2.5, -5.5);
+            shipGroup.add(bridgeTower);
+
+            // Command Bridge Glowing Window
+            const windowGeom = new THREE.PlaneGeometry(6.5, 0.6);
+            const windowMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee, side: THREE.DoubleSide });
+            const windowMesh = new THREE.Mesh(windowGeom, windowMat);
+            windowMesh.position.set(1.0, 2.8, -3.0);
+            shipGroup.add(windowMesh);
+
+            // 3. Glowing Ion Thruster Engines at Stern (Rear Left)
+            const enginePositions = [-5.5, 0.0, 5.5];
+            enginePositions.forEach(zPos => {
+                const nozzleGeom = new THREE.CylinderGeometry(0.9, 1.3, 3.2, 16);
+                const nozzleMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.9, roughness: 0.3 });
+                const nozzle = new THREE.Mesh(nozzleGeom, nozzleMat);
+                nozzle.rotation.z = Math.PI / 2;
+                nozzle.position.set(-13.2, 0.8, zPos);
+                shipGroup.add(nozzle);
+
+                // Ion Engine Plasma Glow Cone
+                const glowGeom = new THREE.ConeGeometry(1.0, 3.5, 16);
+                const glowMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.85 });
+                const engineGlow = new THREE.Mesh(glowGeom, glowMat);
+                engineGlow.rotation.z = Math.PI / 2;
+                engineGlow.position.set(-15.8, 0.8, zPos);
+                shipGroup.add(engineGlow);
+            });
+
+            // 4. Radar Antennas on Stern Roof
+            for (let i = -1; i <= 1; i += 2) {
+                const antGeom = new THREE.CylinderGeometry(0.05, 0.05, 3.5);
+                const antMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+                const antenna = new THREE.Mesh(antGeom, antMat);
+                antenna.position.set(-10, 3.0, i * 4);
+                shipGroup.add(antenna);
+            }
+
+            scene.add(shipGroup);
+        }
+
+        function createRoomModules() {
+            Object.keys(ROOMS_DATA).forEach(key => {
+                const room = ROOMS_DATA[key];
+
+                const roomGeom = new THREE.BoxGeometry(room.size.x, room.size.y, room.size.z);
+
+                const matBlueprint = new THREE.MeshStandardMaterial({
+                    color: room.color,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.85
+                });
+
+                const mesh = new THREE.Mesh(roomGeom, matBlueprint);
+                mesh.position.set(room.pos.x, room.pos.y, room.pos.z);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                mesh.userData = { roomKey: key };
+
+                // Neon Edges
+                const edgesGeom = new THREE.EdgesGeometry(roomGeom);
+                const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
+                const wireframeEdges = new THREE.LineSegments(edgesGeom, lineMat);
+                mesh.add(wireframeEdges);
+
+                shipGroup.add(mesh);
+                roomMeshes[key] = mesh;
+
+                createRoomHotspot(key, room);
+            });
+        }
+
+        function createDoorConnections() {
+            // Door Hatches (`=`) based on sketch connections
+            const connections = [
+                // Köprü <-> Hangar, Science Kafe
+                { from: 'hangar', to: 'kopru' },
+                { from: 'kopru', to: 'science_kafe' },
+                // Science Kafe <-> Kiler, Keşif Güvertesi
+                { from: 'science_kafe', to: 'kiler' },
+                { from: 'science_kafe', to: 'kesif_guvertesi' },
+                // Kiler <-> Köşk
+                { from: 'kiler', to: 'kosk_seyir' },
+                // Yaratım Kabini <-> Keşif Güvertesi
+                { from: 'tanitim_kabini', to: 'kesif_guvertesi' },
+                // Makine Dairesi <-> Pruva WC <-> Kiç WC
+                { from: 'kic_wc', to: 'makine_dairesi' },
+                { from: 'makine_dairesi', to: 'pruva_wc' },
+                { from: 'pruva_wc', to: 'tanitim_kabini' }
+            ];
+
+            const doorMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, wireframe: true });
+
+            connections.forEach(conn => {
+                const r1 = ROOMS_DATA[conn.from];
+                const r2 = ROOMS_DATA[conn.to];
+                if (!r1 || !r2) return;
+
+                const midX = (r1.pos.x + r2.pos.x) / 2;
+                const midZ = (r1.pos.z + r2.pos.z) / 2;
+
+                const doorGeom = new THREE.BoxGeometry(0.8, 1.4, 0.8);
+                const doorMesh = new THREE.Mesh(doorGeom, doorMat);
+                doorMesh.position.set(midX, 0.7, midZ);
+                shipGroup.add(doorMesh);
+                doorMeshes.push(doorMesh);
+            });
+        }
+
+        function createRoomHotspot(key, room) {
+            const container = document.getElementById('room-labels-container');
+
+            const labelEl = document.createElement('div');
+            labelEl.className = 'room-marker flex items-center gap-2 group';
+            labelEl.id = `marker-${key}`;
+            labelEl.onclick = () => selectRoom(key);
+
+            labelEl.innerHTML = `
+                <div class="marker-icon relative w-8 h-8 rounded-full bg-slate-950/90 border border-cyan-400 text-cyan-300 flex items-center justify-center text-xs shadow-[0_0_12px_rgba(6,182,212,0.6)] transition duration-300">
+                    <i class="fa-solid ${room.badgeIcon}"></i>
+                    <span class="absolute inset-0 rounded-full border border-cyan-400 pulse-effect"></span>
+                </div>
+                <div class="hud-panel px-2.5 py-1 rounded text-[11px] font-mono text-cyan-200 font-bold tracking-wider uppercase border border-cyan-500/40 opacity-90 group-hover:opacity-100 transition">
+                    ${room.title}
+                </div>
+            `;
+
+            container.appendChild(labelEl);
+            roomHotspotElements[key] = labelEl;
+        }
+
+        function updateHotspotPositions() {
+            if (isInteriorView) {
+                Object.values(roomHotspotElements).forEach(el => el.style.display = 'none');
+                return;
+            }
+
+            const tempV = new THREE.Vector3();
+            Object.keys(ROOMS_DATA).forEach(key => {
+                const mesh = roomMeshes[key];
+                const labelEl = roomHotspotElements[key];
+
+                if (!mesh || !labelEl) return;
+
+                mesh.getWorldPosition(tempV);
+                tempV.y += ROOMS_DATA[key].size.y / 2 + 0.6;
+                tempV.project(camera);
+
+                const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+                const y = (tempV.y * -0.5 + 0.5) * window.innerHeight;
+
+                if (tempV.z > 1) {
+                    labelEl.style.display = 'none';
+                } else {
+                    labelEl.style.display = 'flex';
+                    labelEl.style.left = `${x}px`;
+                    labelEl.style.top = `${y}px`;
+                }
+            });
+        }
+
+        function selectRoom(key) {
+            playSound('click');
+            selectedRoomKey = key;
+            const room = ROOMS_DATA[key];
+            if (!room) return;
+
+            Object.keys(roomMeshes).forEach(k => {
+                const mesh = roomMeshes[k];
+                if (k === key) {
+                    mesh.material.color.setHex(0xf59e0b);
+                    mesh.material.opacity = 0.95;
+                } else {
+                    mesh.material.color.setHex(ROOMS_DATA[k].color);
+                    mesh.material.opacity = currentRenderMode === 'blueprint' ? 0.85 : 0.9;
+                }
+            });
+
+            const roomMesh = roomMeshes[key];
+            const targetPos = roomMesh.position.clone();
+
+            gsap.to(controls.target, {
+                x: targetPos.x,
+                y: targetPos.y,
+                z: targetPos.z,
+                duration: 1.0,
+                ease: 'power2.out'
+            });
+
+            document.getElementById('infoTitle').innerText = room.title;
+            document.getElementById('infoSubTitle').innerText = room.subtitle;
+            document.getElementById('infoDescription').innerText = room.desc;
+            document.getElementById('infoCapacity').innerText = room.capacity;
+            document.getElementById('infoImage').src = room.img;
+            document.getElementById('infoBadge').innerHTML = `<i class="fa-solid ${room.badgeIcon}"></i>`;
+
+            const doorsContainer = document.getElementById('infoDoors');
+            doorsContainer.innerHTML = (room.doors || ['Üst Koridor (=)']).map(d => `
+                <span class="px-2 py-1 rounded bg-amber-500/20 border border-amber-400/50 text-amber-300">
+                    <i class="fa-solid fa-door-open mr-1"></i>${d}
+                </span>
+            `).join('');
+
+            const featsContainer = document.getElementById('infoFeatures');
+            featsContainer.innerHTML = room.features.map(f => `
+                <div class="px-2.5 py-1.5 rounded bg-slate-900 border border-slate-800 text-slate-300 text-[11px] flex items-center gap-1.5">
+                    <i class="fa-solid fa-angle-right text-cyan-400 text-[9px]"></i> ${f}
+                </div>
+            `).join('');
+
+            const infoPanel = document.getElementById('infoPanel');
+            infoPanel.classList.remove('translate-x-[420px]', 'opacity-0');
+            infoPanel.classList.add('translate-x-0', 'opacity-100');
+        }
+
+        function closeInfoPanel() {
+            playSound('close');
+            const infoPanel = document.getElementById('infoPanel');
+            infoPanel.classList.add('translate-x-[420px]', 'opacity-0');
+            infoPanel.classList.remove('translate-x-0', 'opacity-100');
+            
+            if (selectedRoomKey && roomMeshes[selectedRoomKey]) {
+                roomMeshes[selectedRoomKey].material.color.setHex(ROOMS_DATA[selectedRoomKey].color);
+            }
+            selectedRoomKey = null;
+        }
+
+        function setRenderMode(mode) {
+            playSound('switch');
+            currentRenderMode = mode;
+
+            const btnBP = document.getElementById('btnModeBlueprint');
+            const btn3D = document.getElementById('btnMode3D');
+            const modeText = document.getElementById('currentViewModeText');
+
+            if (mode === 'blueprint') {
+                btnBP.className = "w-full text-left px-3 py-2 rounded bg-cyan-500/25 border border-cyan-400 text-cyan-100 text-xs font-mono font-bold transition flex items-center justify-between";
+                btn3D.className = "w-full text-left px-3 py-2 rounded hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 text-xs font-mono font-bold transition flex items-center justify-between";
+                btnBP.innerHTML = `<span><i class="fa-solid fa-drafting-compass mr-2"></i>BLUEPRINT (MİMARİ)</span><i class="fa-solid fa-check text-cyan-400 text-xs"></i>`;
+                btn3D.innerHTML = `<span><i class="fa-solid fa-rocket mr-2"></i>GERÇEKÇİ 3D GÖVDE</span>`;
+                modeText.innerText = "HOLOGRAM BLUEPRINT (3D)";
+
+                realisticHullMesh.visible = false;
+                wireframeHullMesh.visible = true;
+
+                Object.keys(roomMeshes).forEach(k => {
+                    roomMeshes[k].material.wireframe = true;
+                    roomMeshes[k].material.opacity = 0.85;
+                });
+            } else {
+                btn3D.className = "w-full text-left px-3 py-2 rounded bg-cyan-500/25 border border-cyan-400 text-cyan-100 text-xs font-mono font-bold transition flex items-center justify-between";
+                btnBP.className = "w-full text-left px-3 py-2 rounded hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 text-xs font-mono font-bold transition flex items-center justify-between";
+                btn3D.innerHTML = `<span><i class="fa-solid fa-rocket mr-2"></i>GERÇEKÇİ 3D GÖVDE</span><i class="fa-solid fa-check text-cyan-400 text-xs"></i>`;
+                btnBP.innerHTML = `<span><i class="fa-solid fa-drafting-compass mr-2"></i>BLUEPRINT (MİMARİ)</span>`;
+                modeText.innerText = "GERÇEKÇİ METALLİK 3D GÖVDE";
+
+                realisticHullMesh.visible = true;
+                wireframeHullMesh.visible = false;
+
+                Object.keys(roomMeshes).forEach(k => {
+                    roomMeshes[k].material.wireframe = false;
+                    roomMeshes[k].material.opacity = 0.9;
+                });
+            }
+        }
+
+        function enterRoomInterior() {
+            if (!selectedRoomKey) return;
+            playSound('enter');
+
+            isInteriorView = true;
+            const room = ROOMS_DATA[selectedRoomKey];
+
+            shipGroup.visible = false;
+            closeInfoPanel();
+            document.getElementById('exitInteriorHud').classList.remove('hidden');
+
+            buildInteriorScene(room);
+
+            gsap.to(camera.position, { x: 0, y: 2, z: 5.5, duration: 1.5, ease: 'power2.inOut' });
+            gsap.to(controls.target, { x: 0, y: 1.2, z: 0, duration: 1.5, ease: 'power2.inOut' });
+        }
+
+        function exitRoomInterior() {
+            playSound('close');
+            isInteriorView = false;
+
+            while(interiorGroup.children.length > 0){ 
+                interiorGroup.remove(interiorGroup.children[0]); 
+            }
+
+            shipGroup.visible = true;
+            document.getElementById('exitInteriorHud').classList.add('hidden');
+
+            resetCameraView();
+        }
+
+        function buildInteriorScene(room) {
+            const roomBoxGeom = new THREE.BoxGeometry(11, 5, 9);
+            const roomBoxMat = new THREE.MeshStandardMaterial({
+                color: 0x0f172a,
+                side: THREE.BackSide,
+                roughness: 0.6
+            });
+            const roomShell = new THREE.Mesh(roomBoxGeom, roomBoxMat);
+            roomShell.position.set(0, 2.5, 0);
+            interiorGroup.add(roomShell);
+
+            const roomLight = new THREE.PointLight(room.color, 3.5, 18);
+            roomLight.position.set(0, 4.2, 0);
+            interiorGroup.add(roomLight);
+
+            if (room.type === 'makine') {
+                const coreGeom = new THREE.SphereGeometry(1.6, 32, 32);
+                const coreMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xf59e0b, emissiveIntensity: 0.9 });
+                const core = new THREE.Mesh(coreGeom, coreMat);
+                core.position.set(0, 2.2, 0);
+                interiorGroup.add(core);
+
+                const ringGeom = new THREE.TorusGeometry(2.4, 0.12, 16, 100);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+                const ring = new THREE.Mesh(ringGeom, ringMat);
+                ring.rotation.x = Math.PI / 2;
+                ring.position.set(0, 2.2, 0);
+                interiorGroup.add(ring);
+            } else if (room.type === 'seyir') {
+                const winGeom = new THREE.PlaneGeometry(9, 4);
+                const winMat = new THREE.MeshBasicMaterial({ color: 0x0284c7, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+                const windowPane = new THREE.Mesh(winGeom, winMat);
+                windowPane.position.set(0, 2.5, -4.4);
+                interiorGroup.add(windowPane);
+            } else if (room.type === 'kopru' || room.type === 'sinif') {
+                const tableGeom = new THREE.CylinderGeometry(2.2, 2.4, 0.5, 12);
+                const tableMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 });
+                const table = new THREE.Mesh(tableGeom, tableMat);
+                table.position.set(0, 0.8, 0);
+                interiorGroup.add(table);
+
+                const holoGeom = new THREE.CylinderGeometry(0.6, 0.6, 2.2, 16);
+                const holoMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee, wireframe: true, transparent: true, opacity: 0.75 });
+                const holo = new THREE.Mesh(holoGeom, holoMat);
+                holo.position.set(0, 2.0, 0);
+                interiorGroup.add(holo);
+            } else {
+                const deskGeom = new THREE.BoxGeometry(3.5, 1, 1.6);
+                const deskMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+                const desk = new THREE.Mesh(deskGeom, deskMat);
+                desk.position.set(0, 0.5, -2);
+                interiorGroup.add(desk);
+            }
+        }
+
+        function setupQuickNav() {
+            const list = document.getElementById('quickNavList');
+            list.innerHTML = Object.keys(ROOMS_DATA).map(key => {
+                const r = ROOMS_DATA[key];
+                return `
+                    <button onclick="selectRoom('${key}')" class="text-left px-2 py-1.5 rounded hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 transition flex items-center justify-between border border-transparent hover:border-cyan-500/30">
+                        <span class="truncate"><i class="fa-solid ${r.badgeIcon} mr-1.5 text-cyan-400 text-[10px]"></i>${r.title}</span>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-slate-500"></i>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function resetCameraView() {
+            playSound('click');
+            gsap.to(camera.position, { x: 0, y: 32, z: 32, duration: 1.2, ease: 'power2.out' });
+            gsap.to(controls.target, { x: 0, y: 0, z: 0, duration: 1.2, ease: 'power2.out' });
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioText');
+
+            if (audioEnabled) {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                icon.className = "fa-solid fa-volume-high text-cyan-400";
+                text.innerText = "SES: AÇIK";
+                playSound('enter');
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-slate-400";
+                text.innerText = "SES: KAPALI";
+            }
+        }
+
+        function playSound(type) {
+            if (!audioEnabled || !audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'enter') {
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(660, now + 0.25);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'close' || type === 'switch') {
+                osc.frequency.setValueAtTime(550, now);
+                osc.frequency.exponentialRampToValueAtTime(280, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function animate(time) {
+            requestAnimationFrame(animate);
+
+            controls.update();
+
+            if (shipGroup && !isInteriorView && !selectedRoomKey) {
+                shipGroup.rotation.y = Math.sin(time * 0.0003) * 0.05;
+                shipGroup.position.y = Math.sin(time * 0.0008) * 0.25;
+            }
+
+            updateHotspotPositions();
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
 </html>
