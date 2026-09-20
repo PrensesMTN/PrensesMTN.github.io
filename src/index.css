@@ -110,3 +110,44 @@
 .pulse-effect {
   animation: pulse-ring 2.2s infinite ease-in-out;
 }
+
+/* Light Theme Support */
+.light-theme {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.light-theme .hud-panel {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), inset 0 0 15px rgba(14, 165, 233, 0.04);
+  color: #0f172a;
+}
+
+.light-theme .hud-panel-amber {
+  background: rgba(255, 251, 235, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.12);
+  color: #78350f;
+}
+
+.light-theme .bg-sci-fi-grid {
+  background-image: 
+    linear-gradient(to right, rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14, 165, 233, 0.12) 1px, transparent 1px);
+}
+
+.light-theme ::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.9);
+}
+.light-theme ::-webkit-scrollbar-thumb {
+  background: #0284c7;
+}
+
+.light-theme .scanlines {
+  background: linear-gradient(rgba(240, 240, 240, 0) 50%, rgba(0, 0, 0, 0.05) 50%),
+              linear-gradient(90deg, rgba(2, 132, 199, 0.02), rgba(0, 0, 0, 0.01), rgba(2, 132, 199, 0.02));
+  background-size: 100% 3px, 6px 100%;
+}

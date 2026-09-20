@@ -34,6 +34,14 @@ export class Engine {
   public selectedRoomKey: string | null = null;
   public currentRenderMode: RenderMode = '3d';
   public isInteriorView: boolean = false;
+  public currentTheme: 'dark' | 'light' = 'dark';
+
+  private ambientLight!: THREE.AmbientLight;
+  private sunBackLight!: THREE.DirectionalLight;
+  private keyLight!: THREE.DirectionalLight;
+  private bellyLight!: THREE.DirectionalLight;
+  private starField!: THREE.Points;
+  private gridHelper!: THREE.GridHelper;
 
   constructor(container: HTMLElement, callbacks: EngineCallbacks = {}) {
     this.container = container;
@@ -73,34 +81,34 @@ export class Engine {
     this.controls.target.set(0, 1.0, 0);
 
     // 5. Lighting Setup matching reference art's celestial warmth & rim highlights
-    const ambientLight = new THREE.AmbientLight(0xe2e8f0, 0.85);
-    this.scene.add(ambientLight);
+    this.ambientLight = new THREE.AmbientLight(0xe2e8f0, 0.85);
+    this.scene.add(this.ambientLight);
 
     // Warm celestial sun backlight (creates rim light on brain dome and armor spine)
-    const sunBackLight = new THREE.DirectionalLight(0xffedd5, 2.4);
-    sunBackLight.position.set(-18, 12, -22);
-    this.scene.add(sunBackLight);
+    this.sunBackLight = new THREE.DirectionalLight(0xffedd5, 2.4);
+    this.sunBackLight.position.set(-18, 12, -22);
+    this.scene.add(this.sunBackLight);
 
     // Primary front-side starship key light
-    const keyLight = new THREE.DirectionalLight(0xecfeff, 1.8);
-    keyLight.position.set(15, 25, 28);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 2048;
-    keyLight.shadow.mapSize.height = 2048;
-    this.scene.add(keyLight);
+    this.keyLight = new THREE.DirectionalLight(0xecfeff, 1.8);
+    this.keyLight.position.set(15, 25, 28);
+    this.keyLight.castShadow = true;
+    this.keyLight.shadow.mapSize.width = 2048;
+    this.keyLight.shadow.mapSize.height = 2048;
+    this.scene.add(this.keyLight);
 
     // Underbelly fill light (soft cyan reflection)
-    const bellyLight = new THREE.DirectionalLight(0x0284c7, 0.6);
-    bellyLight.position.set(0, -15, 10);
-    this.scene.add(bellyLight);
+    this.bellyLight = new THREE.DirectionalLight(0x0284c7, 0.6);
+    this.bellyLight.position.set(0, -15, 10);
+    this.scene.add(this.bellyLight);
 
     // 6. Stars & Cosmic Dust Particles
     this.createSpaceStars();
 
     // Subtle tactical holographic grid at bottom
-    const gridHelper = new THREE.GridHelper(100, 50, 0x0284c7, 0x1e293b);
-    gridHelper.position.y = -3.5;
-    this.scene.add(gridHelper);
+    this.gridHelper = new THREE.GridHelper(100, 50, 0x0284c7, 0x1e293b);
+    this.gridHelper.position.y = -3.5;
+    this.scene.add(this.gridHelper);
 
     // 7. Spaceship Hierarchy
     this.shipGroup = new THREE.Group();
@@ -162,8 +170,8 @@ export class Engine {
       transparent: true,
       opacity: 0.85
     });
-    const starField = new THREE.Points(starsGeom, starsMat);
-    this.scene.add(starField);
+    this.starField = new THREE.Points(starsGeom, starsMat);
+    this.scene.add(this.starField);
   }
 
   private bindEvents() {
@@ -302,6 +310,17 @@ export class Engine {
     });
   }
 
+  /**
+   * Concept Overlay Layer toggle
+   */
+  public toggleConceptOverlay(): boolean {
+    return this.hull.toggleConceptOverlay();
+  }
+
+  public setConceptOverlay(enabled: boolean) {
+    this.hull.setConceptOverlay(enabled);
+  }
+
   private updateHotspotPositions() {
     if (!this.callbacks.onHotspotsUpdate) return;
 
@@ -335,6 +354,68 @@ export class Engine {
     });
 
     this.callbacks.onHotspotsUpdate(hotspots);
+  }
+
+  public setTheme(theme: 'dark' | 'light') {
+    this.currentTheme = theme;
+
+    if (theme === 'light') {
+      // Orbital Drydock Pristine Daylight Setting
+      this.scene.background = new THREE.Color(0xe2e8f0);
+      this.scene.fog = new THREE.FogExp2(0xe2e8f0, 0.005);
+      if (this.starField) this.starField.visible = false;
+
+      if (this.ambientLight) {
+        this.ambientLight.color.setHex(0xffffff);
+        this.ambientLight.intensity = 1.35;
+      }
+      if (this.sunBackLight) {
+        this.sunBackLight.color.setHex(0xfff7ed);
+        this.sunBackLight.intensity = 1.8;
+      }
+      if (this.keyLight) {
+        this.keyLight.color.setHex(0xffffff);
+        this.keyLight.intensity = 2.2;
+      }
+      if (this.bellyLight) {
+        this.bellyLight.color.setHex(0x94a3b8);
+        this.bellyLight.intensity = 0.9;
+      }
+      if (this.gridHelper) {
+        (this.gridHelper.material as THREE.Material).opacity = 0.25;
+      }
+      this.renderer.toneMappingExposure = 1.05;
+    } else {
+      // Deep Cosmic Nebula Setting
+      this.scene.background = new THREE.Color(0x060c18);
+      this.scene.fog = new THREE.FogExp2(0x060c18, 0.008);
+      if (this.starField) this.starField.visible = true;
+
+      if (this.ambientLight) {
+        this.ambientLight.color.setHex(0xe2e8f0);
+        this.ambientLight.intensity = 0.85;
+      }
+      if (this.sunBackLight) {
+        this.sunBackLight.color.setHex(0xffedd5);
+        this.sunBackLight.intensity = 2.4;
+      }
+      if (this.keyLight) {
+        this.keyLight.color.setHex(0xecfeff);
+        this.keyLight.intensity = 1.8;
+      }
+      if (this.bellyLight) {
+        this.bellyLight.color.setHex(0x0284c7);
+        this.bellyLight.intensity = 0.6;
+      }
+      if (this.gridHelper) {
+        (this.gridHelper.material as THREE.Material).opacity = 0.45;
+      }
+      this.renderer.toneMappingExposure = 1.15;
+    }
+
+    if (this.hull) {
+      this.hull.setTheme(theme);
+    }
   }
 
   private tick = (time: number = 0) => {

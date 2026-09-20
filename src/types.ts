@@ -1,4 +1,5 @@
 export type RenderMode = 'blueprint' | '3d';
+export type ThemeMode = 'dark' | 'light';
 
 export interface RoomPosition {
   x: number;

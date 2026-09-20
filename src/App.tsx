@@ -6,8 +6,9 @@ import { Navigation } from './components/Navigation';
 import { InfoCard } from './components/InfoCard';
 import { RoomHotspots } from './components/RoomHotspots';
 import { ROOMS_DATA } from './config/roomsData';
-import { HotspotCoordinate, RenderMode } from './types';
+import { HotspotCoordinate, RenderMode, ThemeMode } from './types';
 import { audioEngine } from './utils/AudioEngine';
+import { ConceptModal } from './components/ConceptModal';
 
 export default function App() {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -15,9 +16,23 @@ export default function App() {
 
   const [selectedRoomKey, setSelectedRoomKey] = useState<string | null>(null);
   const [renderMode, setRenderModeState] = useState<RenderMode>('3d');
+  const [theme, setTheme] = useState<ThemeMode>(() => (localStorage.getItem('mothership_theme') as ThemeMode) || 'dark');
   const [isInteriorView, setIsInteriorView] = useState<boolean>(false);
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [hotspots, setHotspots] = useState<HotspotCoordinate[]>([]);
+  const [isConceptModalOpen, setIsConceptModalOpen] = useState<boolean>(false);
+  const [conceptOverlayEnabled, setConceptOverlayEnabled] = useState<boolean>(true);
+
+  // Toggle Concept Overlay
+  const handleToggleConceptOverlay = () => {
+    audioEngine.playSound('switch');
+    if (engineRef.current) {
+      const next = engineRef.current.toggleConceptOverlay();
+      setConceptOverlayEnabled(next);
+    } else {
+      setConceptOverlayEnabled((prev) => !prev);
+    }
+  };
 
   // Room selection handler
   const handleSelectRoom = useCallback((key: string) => {
@@ -41,6 +56,7 @@ export default function App() {
       }
     });
 
+    engine.setTheme(theme);
     engineRef.current = engine;
 
     return () => {
@@ -48,6 +64,23 @@ export default function App() {
       engineRef.current = null;
     };
   }, [handleSelectRoom]);
+
+  // Sync theme changes with Three.js Engine
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.setTheme(theme);
+    }
+  }, [theme]);
+
+  // Toggle Dark / Light Theme
+  const handleToggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('mothership_theme', next);
+      return next;
+    });
+    audioEngine.playSound('switch');
+  };
 
   // Close Info Card
   const handleCloseInfo = () => {
@@ -109,19 +142,25 @@ export default function App() {
   };
 
   const selectedRoom = selectedRoomKey ? ROOMS_DATA[selectedRoomKey] : null;
+  const isLight = theme === 'light';
 
   return (
-    <div className="bg-sci-fi-grid h-screen w-screen flex flex-col overflow-hidden text-slate-100 select-none">
+    <div className={`bg-sci-fi-grid h-screen w-screen flex flex-col overflow-hidden select-none transition-colors duration-300 ${
+      isLight ? 'light-theme bg-slate-100 text-slate-800' : 'bg-[#020617] text-slate-100'
+    }`}>
       {/* Holographic CRT Effect */}
       <div className="scanlines absolute inset-0 z-10 pointer-events-none" />
 
       {/* Header Navbar */}
       <HUDOverlay
         renderMode={renderMode}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
         audioEnabled={audioEnabled}
         onToggleAudio={handleToggleAudio}
         onResetCamera={handleResetCamera}
         onConceptView={handleConceptView}
+        onOpenConceptModal={() => setIsConceptModalOpen(true)}
       />
 
       {/* Main Interactive Stage */}
@@ -137,6 +176,7 @@ export default function App() {
         {!isInteriorView && (
           <RoomHotspots
             hotspots={hotspots}
+            theme={theme}
             selectedRoomKey={selectedRoomKey}
             onSelectRoom={handleSelectRoom}
           />
@@ -147,9 +187,12 @@ export default function App() {
           <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-20 flex flex-col gap-3 pointer-events-auto">
             <Navigation
               renderMode={renderMode}
+              theme={theme}
               onSetRenderMode={handleSetRenderMode}
               selectedRoomKey={selectedRoomKey}
               onSelectRoom={handleSelectRoom}
+              conceptOverlayEnabled={conceptOverlayEnabled}
+              onToggleConceptOverlay={handleToggleConceptOverlay}
             />
           </div>
         )}
@@ -159,6 +202,7 @@ export default function App() {
           <div className="absolute top-4 sm:top-6 right-4 sm:right-6 bottom-4 sm:bottom-6 z-30 pointer-events-auto">
             <InfoCard
               room={selectedRoom}
+              theme={theme}
               onClose={handleCloseInfo}
               onEnterInterior={handleEnterInterior}
             />
@@ -184,20 +228,32 @@ export default function App() {
         )}
 
         {/* Footer HUD Controls Help */}
-        <div className="absolute bottom-3 left-4 sm:left-6 z-20 text-[11px] font-mono text-slate-400 flex items-center gap-3 sm:gap-4 bg-slate-950/80 px-3 py-1.5 rounded border border-slate-800 pointer-events-none">
+        <div className={`absolute bottom-3 left-4 sm:left-6 z-20 text-[11px] font-mono flex items-center gap-3 sm:gap-4 px-3 py-1.5 rounded border pointer-events-none transition-colors ${
+          isLight 
+            ? 'bg-white/90 text-slate-600 border-slate-300 shadow-sm' 
+            : 'bg-slate-950/80 text-slate-400 border-slate-800'
+        }`}>
           <div className="flex items-center gap-1">
-            <Mouse className="w-3.5 h-3.5 text-cyan-400" />
+            <Mouse className={`w-3.5 h-3.5 ${isLight ? 'text-cyan-600' : 'text-cyan-400'}`} />
             <span>Sol Tık: Görüşü Döndür</span>
           </div>
           <div className="hidden sm:flex items-center gap-1">
-            <Move className="w-3.5 h-3.5 text-cyan-400" />
+            <Move className={`w-3.5 h-3.5 ${isLight ? 'text-cyan-600' : 'text-cyan-400'}`} />
             <span>Sağ Tık: Pan / Kaydır</span>
           </div>
           <div className="flex items-center gap-1">
-            <ZoomIn className="w-3.5 h-3.5 text-cyan-400" />
+            <ZoomIn className={`w-3.5 h-3.5 ${isLight ? 'text-cyan-600' : 'text-cyan-400'}`} />
             <span>Tekerlek: Yakınlaştır</span>
           </div>
         </div>
+
+        {/* Concept Comparison Modal */}
+        <ConceptModal
+          isOpen={isConceptModalOpen}
+          theme={theme}
+          onClose={() => setIsConceptModalOpen(false)}
+          onAlignCamera={handleConceptView}
+        />
       </div>
     </div>
   );
