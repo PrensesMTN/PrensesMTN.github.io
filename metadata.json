@@ -1,0 +1,6 @@
+{
+  "name": "TeknoSanat Akademi - 3D Uzay Gemisi Kampüsü",
+  "description": "TeknoSanat Akademi 3D uzay gemisi kampüsü, dış gövde ve mimari iç kroki simülasyonu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
